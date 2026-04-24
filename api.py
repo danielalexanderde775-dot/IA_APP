@@ -9,18 +9,39 @@ scaler = joblib.load("scaler.pkl")
 
 @app.route("/predict", methods=["POST"])
 def predict():
-    data = request.json["data"]
-    print("INPUT:", data)
-    print("SHAPE:", np.array(data).shape)
-    data = np.array(data).reshape(1, -1)
-    data = scaler.transform(data)
+    try:
+        data = request.json["data"]
 
-    pred = model.predict(data)[0]
+        x = np.array(data, dtype=float)
 
-    return jsonify({"letra": pred})
+        print("INPUT:", x)
+        print("SHAPE:", x.shape)
+
+        # 🔥 VALIDACIÓN CLAVE
+        if len(x) != 63:
+            return jsonify({
+                "error": f"Se esperaban 63 features (21 puntos x,y,z), llegaron {len(x)}"
+            }), 400
+
+        # reshape correcto
+        x = x.reshape(1, -1)
+
+        # scaler
+        x = scaler.transform(x)
+
+        # predicción
+        pred = model.predict(x)[0]
+
+        return jsonify({"letra": str(pred)})
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
 
 @app.route("/")
 def home():
     return "API LSM funcionando 🔥"
 
-app.run(host="0.0.0.0", port=5000)
+
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=5000)
