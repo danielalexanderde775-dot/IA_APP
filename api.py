@@ -17,4 +17,8 @@ def predict():
 
     return jsonify({"letra": pred})
 
+@app.route("/")
+def home():
+    return "API LSM funcionando 🔥"
+
 app.run(host="0.0.0.0", port=5000)
