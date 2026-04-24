@@ -10,6 +10,8 @@ scaler = joblib.load("scaler.pkl")
 @app.route("/predict", methods=["POST"])
 def predict():
     data = request.json["data"]
+    print("INPUT:", data)
+    print("SHAPE:", np.array(data).shape)
     data = np.array(data).reshape(1, -1)
     data = scaler.transform(data)
 
